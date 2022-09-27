@@ -24,3 +24,4 @@ def pingSelectedTeam():
 def get_full_Name(first_name:str, second_name:str):
     full_name = first_name.title() + "" + second_name.title()
     return full_name
+
