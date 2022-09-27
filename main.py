@@ -1,8 +1,22 @@
+from fastapi import FastAPI, Path, Query, Body, Cookie, Header, Depends, HTTPException, status
+from fastapi.testclient import TestClient
 from enum import Enum
-from pydantic import BaseModel
-from fastapi import FastAPI, Query
+from pydantic import BaseModel, Field, HttpUrl, EmailStr
+from datetime import datetime, time, timedelta
+from uuid import UUID
 
-from fastapi import FastAPI
+app = FastAPI()
+
+items = {
+    "foo": {"name": "Foo", "price": 50.2},
+    "bar": {"name": "Bar", "description": "The bartenders", "price": 62, "tax": 20.2},
+    "baz": {"name": "Baz", "description": None, "price": 50.2, "tax": 10.5, "tags": []},
+}
+
+
+class Image(BaseModel):
+    url: HttpUrl
+    name: str
 
 
 class Item(BaseModel):
@@ -10,6 +24,32 @@ class Item(BaseModel):
     description: str | None = None
     price: float
     tax: float | None = None
+    tags: set[str] = set()
+    images: list[Image] | None = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "Foo",
+                "description": "A very nice Item",
+                "price": 35.4,
+                "tax": 3.2,
+                "tags": ["Foo", "Bar"],
+                "images": [
+                    {
+                        "url": "https://example.com/baz.jpg",
+                        "name": "The Foo live"
+                    }
+                ]
+            }
+        }
+
+
+class Offer(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    items: list[Item]
 
 
 class ModelName(str, Enum):
@@ -18,7 +58,22 @@ class ModelName(str, Enum):
     lenet = "lenet"
 
 
-app = FastAPI()
+class UserIn(BaseModel):
+    username: str
+    password: str
+    email: EmailStr
+    full_name: str | None = None
+
+
+class UserOut(BaseModel):
+    username: str
+    email: EmailStr
+    full_name: str | None = None
+
+
+@app.post("/user/", response_model=UserOut)
+async def create_user(user: UserIn):
+    return user
 
 
 @app.get("/models/{model_name}")
@@ -32,20 +87,78 @@ async def get_model(model_name: ModelName):
     return {"model_name": model_name, "message": "Have some residuals"}
 
 
-fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
-
-
-@app.post("/items/")
+@app.post("/items/", response_model=Item)
 async def create_item(item: Item):
-    item_dict = item.dict()
-    if item.tax:
-        price_with_tax = item.price + item.tax
-        item_dict.update({"price_with_tax": price_with_tax})
-    return item_dict
+    return item
 
 
-async def read_items(q: str | None = Query(default=None, max_length=50)):
-    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
-    if q:
-        results.update({"q": q})
+@app.put("/items/{item_id}")
+async def update_item(
+        *,
+        item_id: int,
+        item: Item = Body(
+            examples={
+                "normal": {
+                    "summary": "A normal example",
+                    "description": "A **normal** item works correctly.",
+                    "value": {
+                        "name": "Foo",
+                        "description": "A very nice Item",
+                        "price": 35.4,
+                        "tax": 3.2,
+                    },
+                },
+                "converted": {
+                    "summary": "An example with converted data",
+                    "description": "FastAPI can convert price `strings` to actual `numbers` automatically",
+                    "value": {
+                        "name": "Bar",
+                        "price": "35.4",
+                    },
+                },
+                "invalid": {
+                    "summary": "Invalid data is rejected with an error",
+                    "value": {
+                        "name": "Baz",
+                        "price": "thirty five point four",
+                    },
+                },
+            },
+        ),
+):
+    results = {"item_id": item_id, "item": item}
     return results
+
+
+@app.get("/items/{item_id}", response_model=Item, response_model_exclude_unset=True)
+async def read_item(item_id: str):
+    return items[item_id]
+
+
+@app.post("/offers/")
+async def create_offer(offer: Offer):
+    return offer
+
+
+@app.post("/images/multiple/")
+async def create_multiple_images(images: list[Image]):
+    return images
+
+
+@app.post("/index-weights/")
+async def create_index_weights(weights: dict[int, float]):
+    return weights
+
+
+@app.get("/")
+async def read_main():
+    return {"msg": "Hello World"}
+
+
+client = TestClient(app)
+
+
+def test_read_main():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"msg": "Hello World"}
