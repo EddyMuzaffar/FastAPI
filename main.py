@@ -1,7 +1,7 @@
-from uuid import uuid4
-from fastapi import FastAPI, Query
-from typing import List
 import json
+from typing import List
+
+from fastapi import FastAPI, Query
 
 f = open('db.json', 'r')
 data = json.load(f)
