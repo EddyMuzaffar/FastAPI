@@ -81,6 +81,13 @@
             "orders": [
                 1
             ]
+        },
+        {
+            "id": 2,
+            "email": "test@test.com",
+            "firstname": "test",
+            "lastname": "test",
+            "orders": null
         }
     ]
 }

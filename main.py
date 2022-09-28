@@ -1,5 +1,5 @@
 from uuid import uuid4
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from typing import List
 import json
 
@@ -23,7 +23,7 @@ def add_product(name: str, description: str, price: float, stock: int):
     new_product = {
         "id": last_product_id + 1,
         "name": name,
-        "description": description,
+        "description": description if description else None,
         "price": price,
         "stock": stock
     }
@@ -69,7 +69,7 @@ def read_product(product_id: int):
 # -------------------------------------- Clients -------------------------------------- #
 # add new client to db.json
 @app.post("/clients/add")
-def add_client(email: str, firstname: str, lastname: str, orders: List[int]):
+def add_client(email: str, firstname: str, lastname: str, orders: List[int] = Query(None)):
     last_client_id = data['clients'][-1]['id']
     new_client = {
         "id": last_client_id + 1,
@@ -89,11 +89,21 @@ def add_client(email: str, firstname: str, lastname: str, orders: List[int]):
 @app.post("/orders/add")
 def add_order(products: List[int], client_id: int):
     last_order_id = data['orders'][-1]['id']
+    # calculate total price from all products in this order
+    total_price = 0
+    for product_id in products:
+        for product in data['products']:
+            if product['id'] == product_id:
+                total_price += product['price']
+
     new_order = {
         "id": last_order_id + 1,
         "products": products,
-        "client_id": client_id
+        "client_id": client_id,
+        "total_price": total_price
+
     }
+    
     data['orders'].append(new_order)
     with open('db.json', 'w') as f:
         json.dump(data, f, indent=4)
