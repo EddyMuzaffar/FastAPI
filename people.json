@@ -1,28 +1,12 @@
-{
-  "people" : [
-    {
-      "id" : 1,
-      "name": "Joe",
-      "age" : 25,
-      "gender" : "M"
-    },
-    {
-      "id" : 2,
-      "name": "Joezzz",
-      "age" : 25,
-      "gender" : "M"
-    },
-    {
-      "id" : 3,
-      "name": "Raaa",
-      "age" : 25,
-      "gender" : "M"
-    },
-    {
-      "id" : 4,
-      "name": "zdzd",
-      "age" : 25,
-      "gender" : "M"
-    }
+{"people":
+  [
+    {"id": 1, "name": "Joe", "age": 25, "gender": "M",
+    "tools": [{
+      "id_tool" : 2,
+      "name_tool" : "axe"
+    }]},
+    {"id": 3, "name": "Raaa", "age": 25, "gender": "M"},
+    {"id": 4, "name": "zdzd", "age": 25, "gender": "M"},
+    {"id": 7, "name": "zfzfzf", "age": 34, "gender": "M"}
   ]
 }
