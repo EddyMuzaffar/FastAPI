@@ -14,6 +14,7 @@ app = FastAPI()
 def read_root():
     return data
 
+
 # --------------------------------------- Product --------------------------------------- #
 # add new product to db.json
 @app.post("/products/add")
@@ -29,7 +30,8 @@ def add_product(name: str, description: str, price: float, stock: int):
     data['products'].append(new_product)
     with open('db.json', 'w') as f:
         json.dump(data, f, indent=4)
-    return data
+    return data['products']
+
 
 # update product by product_id
 @app.put("/products/update/{product_id}")
@@ -42,8 +44,18 @@ def update_product(product_id: int, name: str, description: str, price: float, s
             product['stock'] = stock
     with open('db.json', 'w') as f:
         json.dump(data, f, indent=4)
-    return product
+    return data['products']
 
+
+# delete product by product_id
+@app.delete("/products/delete/{product_id}")
+def delete_product(product_id: int):
+    for product in data['products']:
+        if product['id'] == product_id:
+            data['products'].remove(product)
+    with open('db.json', 'w') as f:
+        json.dump(data, f, indent=4)
+    return data['products']
 
 
 @app.get("/products/{product_id}")
@@ -53,3 +65,36 @@ def read_product(product_id: int):
         if product['id'] == product_id:
             return product
 
+
+# -------------------------------------- Clients -------------------------------------- #
+# add new client to db.json
+@app.post("/clients/add")
+def add_client(email: str, firstname: str, lastname: str, orders: List[int]):
+    last_client_id = data['clients'][-1]['id']
+    new_client = {
+        "id": last_client_id + 1,
+        "email": email,
+        "firstname": firstname,
+        "lastname": lastname,
+        "orders": orders
+    }
+    data['clients'].append(new_client)
+    with open('db.json', 'w') as f:
+        json.dump(data, f, indent=4)
+    return data['clients']
+
+
+# --------------------------------------- Order --------------------------------------- #
+# add new order to db.json with multiple products, each product has quantity, and total price, and client_id
+@app.post("/orders/add")
+def add_order(products: List[int], client_id: int):
+    last_order_id = data['orders'][-1]['id']
+    new_order = {
+        "id": last_order_id + 1,
+        "products": products,
+        "client_id": client_id
+    }
+    data['orders'].append(new_order)
+    with open('db.json', 'w') as f:
+        json.dump(data, f, indent=4)
+    return data['orders']
