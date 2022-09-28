@@ -1,0 +1,72 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "username": "Test",
+            "money": 1000,
+            "factories": []
+        }
+    ],
+    "posts": [
+        {
+            "id": 1,
+            "title": "",
+            "content": "Markdown ? HTML ? Just Text ?",
+            "author": "",
+            "publishedAt": "Date ?",
+            "category": 1
+        }
+    ],
+    "categories": [
+        {
+            "id": 1,
+            "title": "Non-class\u00e9"
+        }
+    ],
+    "products": [
+        {
+            "id": 1,
+            "name": "",
+            "descriptions": "",
+            "variants": [
+                {
+                    "color": "?"
+                }
+            ],
+            "price": 10,
+            "stock": 10
+        },
+        {
+            "id": 2,
+            "name": "Coucou",
+            "description": "Le beau Coucou",
+            "price": 30.0,
+            "stock": 10
+        }
+    ],
+    "orders": [
+        {
+            "id": 1,
+            "products": [
+                {
+                    "product_id": 1,
+                    "variant": 0,
+                    "quantity": 1
+                }
+            ],
+            "total_price": 10,
+            "client_id": 1
+        }
+    ],
+    "clients": [
+        {
+            "id": 1,
+            "email": "",
+            "firstname": "",
+            "lastname": "",
+            "orders": [
+                1
+            ]
+        }
+    ]
+}
