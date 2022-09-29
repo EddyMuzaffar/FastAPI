@@ -1,12 +1,1 @@
-{"people":
-  [
-    {"id": 1, "name": "Joe", "age": 25, "gender": "M",
-    "tools": [{
-      "id_tool" : 2,
-      "name_tool" : "axe"
-    }]},
-    {"id": 3, "name": "Raaa", "age": 25, "gender": "M"},
-    {"id": 4, "name": "zdzd", "age": 25, "gender": "M"},
-    {"id": 7, "name": "zfzfzf", "age": 34, "gender": "M"}
-  ]
-}
+{"people": [{"id": 7, "name": "zfzfzf", "age": 34, "gender": "M", "tools": [{"id_tool": 3, "name_tool": "pix"}]}, {"id": 10, "name": "zdzd", "age": 25, "gender": "M", "tools": []}, {"id": 9, "name": "zdzd", "age": 25, "gender": "M", "tools": [{"id_tool": 1, "name_tool": "axe"}]}, {"id": 8, "name": "edouar", "age": 15, "gender": "M", "tools": [{"id_tool": 1, "name_tool": "axe"}]}, {"id": 5, "name": "philips", "age": 23, "gender": "M", "tools": [{"id_tool": 1, "name_tool": "axe"}, {"id_tool": 3, "name_tool": "pix"}]}, {"id": 3, "name": "luc", "age": 33, "gender": "M", "tools": [{"id_tool": 3, "name_tool": "pix"}]}, {"id": 2, "name": "charle", "age": 23, "gender": "M", "tools": []}, {"id": 1, "name": "bess", "age": 53, "gender": "F", "tools": [{"id_tool": 1, "name_tool": "axe"}, {"id_tool": 3, "name_tool": "axe"}]}]}
