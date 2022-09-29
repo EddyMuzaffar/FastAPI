@@ -107,10 +107,7 @@ def post_tools_person(id_person: int, tool: Tools):
     json_tools_data = jsonable_encoder(tool)
     for person in people:
         if person['id'] == id_person:
-            if 'tools' in person:
-                person['tools'].append(json_tools_data)
-            else:
-                person['tools'] = [json_tools_data]
+            person['tools'].append(json_tools_data)
             write_json(people)
             res = {
                 "success": True,
