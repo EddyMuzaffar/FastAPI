@@ -1,10 +1,12 @@
-Primary authors 
+Primary authors
 ===============
 
-Florian Cohenjoly
+__[Florent Cohen Joly](https://github.com/FlorianCohenJoly)__
 
-Eddy Muzaffar 
+__[Eddy Muzaffar](https://github.com/EddyMuzaffar)__
 
-Thomas Lamiable
+__[Thomas Lamiable](https://github.com/Thomlam)__
 
-Baptiste Dumoulin
+__[Baptiste Dumoulin](https://github.com/Ptitbapt)__
+
+
