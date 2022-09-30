@@ -72,22 +72,19 @@
             ]
         }
     ],
-    "clients": [
+    "people":[
         {
             "id": 1,
-            "email": "",
-            "firstname": "",
-            "lastname": "",
-            "orders": [
-                1
+            "name": "",
+            "age": "",
+            "gender": "",
+            "tools": [
+                {
+                    "id_tool": 1,
+                    "name_tool": ""
+                }
             ]
-        },
-        {
-            "id": 2,
-            "email": "test@test.com",
-            "firstname": "test",
-            "lastname": "test",
-            "orders": null
         }
     ]
+
 }

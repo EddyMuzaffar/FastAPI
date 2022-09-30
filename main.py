@@ -66,28 +66,68 @@ def read_product(product_id: int):
             return product
 
 
-# -------------------------------------- Clients -------------------------------------- #
-# add new client to db.json
-@app.post("/clients/add")
-def add_client(email: str, firstname: str, lastname: str, orders: List[int] = Query(None)):
-    last_client_id = data['clients'][-1]['id']
-    new_client = {
-        "id": last_client_id + 1,
-        "email": email,
-        "firstname": firstname,
-        "lastname": lastname,
-        "orders": orders
+# -------------------------------------- People -------------------------------------- #
+# add new people to db.json
+@app.post("/people/add")
+def add_people(people_id: int, name: str, age: int, gender: str, tools: List[str] = Query(None)):
+    last_people_id = data['people'][-1]['id']
+    new_people = {
+        "id": last_people_id + 1,
+        "people_id": people_id,
+        "name": name,
+        "age": age,
+        "gender": gender,
+        "tools": tools
     }
-    data['clients'].append(new_client)
+    data['people'].append(new_people)
     with open('db.json', 'w') as f:
         json.dump(data, f, indent=4)
-    return data['clients']
+    return data['people']
+
+
+@app.get("/people/{people_id}")
+# read data from db.json by people_id
+def read_people(people_id: int):
+    for people in data['people']:
+        if people['id'] == people_id:
+            return people
+
+
+@app.get("/people")
+# read all people from db.json
+def read_all_people():
+    return data['people']
+
+
+# update people by people_id
+@app.put("/people/update/{people_id}")
+def update_people(people_id: int, name: str, age: int, gender: str, tools: List[str] = Query(None)):
+    for people in data['people']:
+        if people['id'] == people_id:
+            people['name'] = name
+            people['age'] = age
+            people['gender'] = gender
+            people['tools'] = tools
+    with open('db.json', 'w') as f:
+        json.dump(data, f, indent=4)
+    return data['people']
+
+
+# delete people by people_id
+@app.delete("/people/delete/{people_id}")
+def delete_people(people_id: int):
+    for people in data['people']:
+        if people['id'] == people_id:
+            data['people'].remove(people)
+    with open('db.json', 'w') as f:
+        json.dump(data, f, indent=4)
+    return data['people']
 
 
 # --------------------------------------- Order --------------------------------------- #
-# add new order to db.json with multiple products, each product has quantity, and total price, and client_id
+# add new order to db.json
 @app.post("/orders/add")
-def add_order(products: List[int], client_id: int):
+def add_order(products: List[int], people_id: int):
     last_order_id = data['orders'][-1]['id']
     # calculate total price from all products in this order
     total_price = 0
@@ -99,11 +139,11 @@ def add_order(products: List[int], client_id: int):
     new_order = {
         "id": last_order_id + 1,
         "products": products,
-        "client_id": client_id,
+        "people_id": people_id,
         "total_price": total_price
 
     }
-    
+
     data['orders'].append(new_order)
     with open('db.json', 'w') as f:
         json.dump(data, f, indent=4)
