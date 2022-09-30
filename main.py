@@ -1,5 +1,6 @@
 import json
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
 
@@ -12,20 +13,24 @@ class Lieux(BaseModel):
 app = FastAPI()
 
 with open('db.json', 'r') as f:
-    people = json.load(f)
+    lieux = json.load(f)
 
 
 @app.get("/lieux/")
 def get_lieux():
-    return people
+    return lieux
 
 
 @app.post("/lieux/")
 def post_lieu(lieu: Lieux):
     with open('db.json', mode="w") as f:
-        people['lieux'].append(lieu.dict())
-        f.write(json.dumps(people))
-    return people
+        lieux['lieux'].append(lieu.dict())
+        f.write(json.dumps(lieux))
+    return lieux
 
-
+@app.put("/lieux/")
+def update_lieu(lieu: Lieux):
+    update_lieu_encoded = jsonable_encoder(lieu)
+    lieux = update_lieu_encoded
+    return update_lieu_encoded
 
