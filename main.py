@@ -165,6 +165,9 @@ def get_tools_person(id_person: int):
 
 
 
+
+
+
 def write_json():
     jsonr = {
         "people": people,
