@@ -1,0 +1,8 @@
+<application>
+  <component name="SourceryConfigService">
+    <option name="pluginVersion" value="0.12.9" />
+    <option name="sourceryExecutable" value="$APPLICATION_PLUGINS_DIR$/sourcery/sourcery_binaries/install/mac/sourcery" />
+    <option name="sourceryProductName" />
+    <option name="sourceryVersion" value="0.12.9" />
+  </component>
+</application>
