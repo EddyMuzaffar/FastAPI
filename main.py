@@ -1,6 +1,6 @@
 import json
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -187,11 +187,7 @@ def post_product(product: Product):
     product_data = jsonable_encoder(product)
     for product in products:
         if product['name'] == product_data['name']:
-            res = {
-                "success": False,
-                "msg": "Product already exist"
-            }
-            return res
+            raise HTTPException(status_code=404, detail="Tools not found")
     products.append(product_data)
     write_json()
     res = {
@@ -212,10 +208,7 @@ def delete_product(name: str):
                 "data": product
             }
             return res
-    res = {
-        "success": False,
-        "msg": "No product match"
-    }
+    raise HTTPException(status_code=404, detail="Tools not found")
     return res
 
 
@@ -228,11 +221,7 @@ def get_product_by_name(name: str):
                 "data": product
             }
             return res
-    res = {
-        "success": False,
-        "msg": "No product match"
-    }
-    return res
+    raise HTTPException(status_code=404, detail="Tools not found")
 
 
 @app.get("/product/{name}/order", status_code=status.HTTP_200_OK)
@@ -248,10 +237,7 @@ def get_product_by_name(name: str):
         }
 
     else:
-        res = {
-            "success": False,
-            "msg": "No product match"
-        }
+        raise HTTPException(status_code=404, detail="Tools not found")
     return res
 
 
@@ -267,11 +253,7 @@ def post_order(order: Order):
     order_data = jsonable_encoder(order)
     for order in orders:
         if order['id_order'] == order_data['id_order']:
-            res = {
-                "success": False,
-                "msg": "Order already exist"
-            }
-            return res
+            raise HTTPException(status_code=404, detail="Tools not found")
     orders.append(order_data)
     write_json()
     res = {
@@ -292,15 +274,16 @@ def delete_order(id_order: int):
                 "data": order
             }
             return res
-    res = {
-        "success": False,
-        "msg": "No order match"
-    }
-    return res
+    raise HTTPException(status_code=404, detail="Tools not found")
 
 
 @app.get("/order/{id_order}", status_code=status.HTTP_200_OK)
 def get_order_by_id(id_order: int):
+    """
+
+    :param id_order:
+    :return:
+    """
     for order in orders:
         if order['id_order'] == id_order:
             res = {
@@ -308,11 +291,9 @@ def get_order_by_id(id_order: int):
                 "data": order
             }
             return res
-    res = {
-        "success": False,
-        "msg": "No order match"
-    }
-    return res
+        raise HTTPException(status_code=404, detail="Tools not found")
+
+
 
 
 def write_json():
