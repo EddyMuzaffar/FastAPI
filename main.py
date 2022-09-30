@@ -64,6 +64,11 @@ def get_person(p_id: int):
 
 @app.post('/people', status_code=status.HTTP_201_CREATED)
 def post_person(person: Person):
+    """
+
+    :param person:
+    :return:
+    """
     person_data = jsonable_encoder(person)
     for person in people:
         if person['id_person'] == person_data['id_person']:
@@ -85,6 +90,11 @@ def post_person(person: Person):
 
 @app.delete("/people/{id_person}", status_code=status.HTTP_200_OK)
 def delete_person(id_person: int):
+    """
+
+    :param id_person:
+    :return:
+    """
     for person in people:
         if person['id_person'] == id_person:
             people.remove(person)
@@ -104,6 +114,11 @@ def delete_person(id_person: int):
 
 @app.get('/people/{id_person}/tools', status_code=status.HTTP_200_OK)
 def get_tools_person(id_person: int):
+    """
+
+    :param id_person:
+    :return:
+    """
     for person in people:
         if person['id_person'] == id_person:
             if 'tools' in person:
@@ -128,6 +143,11 @@ def get_tools_person(id_person: int):
 
 @app.get('/people/', status_code=status.HTTP_200_OK)
 def get_person_by_tools_name(tool_name: str):
+    """
+
+    :param tool_name:
+    :return:
+    """
     people_match = []
     for p in people:
         for tool in p['tools']:
@@ -138,6 +158,12 @@ def get_person_by_tools_name(tool_name: str):
 
 @app.post('/people/{id_person}/tools', status_code=status.HTTP_201_CREATED)
 def post_tools_person(id_person: int, tool: Tools):
+    """
+
+    :param id_person:
+    :param tool:
+    :return:
+    """
     json_tools_data = jsonable_encoder(tool)
     for person in people:
         if person['id_person'] == id_person:
@@ -157,6 +183,11 @@ def post_tools_person(id_person: int, tool: Tools):
 
 @app.get('/people/{id_person}/order', status_code=status.HTTP_200_OK)
 def get_tools_person(id_person: int):
+    """
+
+    :param id_person:
+    :return:
+    """
     orders_match = []
     for order in orders:
         if id_person == order['id_person']:
@@ -184,6 +215,11 @@ def get_product():
 
 @app.post("/product", status_code=status.HTTP_201_CREATED)
 def post_product(product: Product):
+    """
+
+    :param product:
+    :return:
+    """
     product_data = jsonable_encoder(product)
     for product in products:
         if product['name'] == product_data['name']:
@@ -208,12 +244,16 @@ def delete_product(name: str):
                 "data": product
             }
             return res
-    raise HTTPException(status_code=404, detail="Tools not found")
-    return res
+        raise HTTPException(status_code=404, detail="Tools not found")
 
 
 @app.get("/product/{name}", status_code=status.HTTP_200_OK)
 def get_product_by_name(name: str):
+    """
+
+    :param name:
+    :return:
+    """
     for product in products:
         if product['name'] == name:
             res = {
@@ -226,6 +266,11 @@ def get_product_by_name(name: str):
 
 @app.get("/product/{name}/order", status_code=status.HTTP_200_OK)
 def get_product_by_name(name: str):
+    """
+
+    :param name:
+    :return:
+    """
     orders_match = []
     for order in orders:
         if name in order['id_product']:
@@ -250,6 +295,11 @@ def get_order():
 
 @app.post("/order", status_code=status.HTTP_201_CREATED)
 def post_order(order: Order):
+    """
+
+    :param order:
+    :return:
+    """
     order_data = jsonable_encoder(order)
     for order in orders:
         if order['id_order'] == order_data['id_order']:
@@ -266,6 +316,11 @@ def post_order(order: Order):
 
 @app.delete("/order/{id_order}", status_code=status.HTTP_200_OK)
 def delete_order(id_order: int):
+    """
+
+    :param id_order:
+    :return:
+    """
     for order in orders:
         if order['id_order'] == id_order:
             orders.remove(order)
@@ -292,8 +347,6 @@ def get_order_by_id(id_order: int):
             }
             return res
         raise HTTPException(status_code=404, detail="Tools not found")
-
-
 
 
 def write_json():
