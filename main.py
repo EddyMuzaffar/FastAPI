@@ -56,7 +56,7 @@ def get_person():
     return people
 
 
-@app.get('/people/{id_person}')
+@app.get('/people/{id_person}', status_code=status.HTTP_200_OK)
 def get_person(p_id: int):
     person = [p for p in people if p['id_person'] == p_id]
     return person[0] if len(person) > 0 else {}
@@ -100,19 +100,14 @@ def delete_person(id_person: int):
             people.remove(person)
             res = {
                 "success": True,
-                "data": person['tools']
+                "data": person
 
             }
             return res
-    res = {
-        "success": False,
-        "msg": "No ID for this person"
-
-    }
-    return res
+    raise HTTPException(status_code=403, detail="People not found")
 
 
-@app.get('/people/{id_person}/tools', status_code=status.HTTP_200_OK)
+@app.get('/people/{id_person}/tools', status_code=status.HTTP_200_OK,)
 def get_tools_person(id_person: int):
     """
 
@@ -121,24 +116,12 @@ def get_tools_person(id_person: int):
     """
     for person in people:
         if person['id_person'] == id_person:
-            if 'tools' in person:
-                res = {
-                    "success": True,
-                    "data": person['tools']
-
-                }
+            if len(person['tools']):
+                res = person['tools']
                 return res
             else:
-                res = {
-                    "success": False,
-                    "msg": 'No tools for this person'
-                }
-                return res
-    res = {
-        "success": False,
-        "msg": "No people match"
-    }
-    return res
+                raise HTTPException(status_code=404, detail="Tools not found")
+    raise HTTPException(status_code=404, detail="People not found")
 
 
 @app.get('/people/', status_code=status.HTTP_200_OK)
@@ -174,11 +157,7 @@ def post_tools_person(id_person: int, tool: Tools):
                 "data": person['tools']
             }
             return res
-    res = {
-        "success": False,
-        "msg": "No people match"
-    }
-    return res
+    raise HTTPException(status_code=404, detail="People not found")
 
 
 @app.get('/people/{id_person}/order', status_code=status.HTTP_200_OK)
@@ -196,157 +175,15 @@ def get_tools_person(id_person: int):
         res = {
             "success": True,
             "data": orders_match
-        }
-
+            }
+        return res
     else:
-        res = {
-            "success": False,
-            "msg": "No people match"
-        }
-    return res
+        raise HTTPException(status_code=404, detail="Not order found")
 
 
-# ----------------- PRODUCTS ----------------- #
-
-@app.get("/product")
-def get_product():
-    return products
 
 
-@app.post("/product", status_code=status.HTTP_201_CREATED)
-def post_product(product: Product):
-    """
 
-    :param product:
-    :return:
-    """
-    product_data = jsonable_encoder(product)
-    for product in products:
-        if product['name'] == product_data['name']:
-            raise HTTPException(status_code=404, detail="Tools not found")
-    products.append(product_data)
-    write_json()
-    res = {
-        "success": True,
-        "data": product_data,
-        "msg": "Product has been post"
-    }
-    return res
-
-
-@app.delete("/product/{name}", status_code=status.HTTP_200_OK)
-def delete_product(name: str):
-    for product in products:
-        if product['name'] == name:
-            products.remove(product)
-            res = {
-                "success": True,
-                "data": product
-            }
-            return res
-        raise HTTPException(status_code=404, detail="Tools not found")
-
-
-@app.get("/product/{name}", status_code=status.HTTP_200_OK)
-def get_product_by_name(name: str):
-    """
-
-    :param name:
-    :return:
-    """
-    for product in products:
-        if product['name'] == name:
-            res = {
-                "success": True,
-                "data": product
-            }
-            return res
-    raise HTTPException(status_code=404, detail="Tools not found")
-
-
-@app.get("/product/{name}/order", status_code=status.HTTP_200_OK)
-def get_product_by_name(name: str):
-    """
-
-    :param name:
-    :return:
-    """
-    orders_match = []
-    for order in orders:
-        if name in order['id_product']:
-            orders_match.append(order)
-    if len(orders_match) > 0:
-        res = {
-            "success": True,
-            "data": orders_match
-        }
-
-    else:
-        raise HTTPException(status_code=404, detail="Tools not found")
-    return res
-
-
-# ----------------- ORDERS ----------------- #
-
-@app.get("/order")
-def get_order():
-    return orders
-
-
-@app.post("/order", status_code=status.HTTP_201_CREATED)
-def post_order(order: Order):
-    """
-
-    :param order:
-    :return:
-    """
-    order_data = jsonable_encoder(order)
-    for order in orders:
-        if order['id_order'] == order_data['id_order']:
-            raise HTTPException(status_code=404, detail="Tools not found")
-    orders.append(order_data)
-    write_json()
-    res = {
-        "success": True,
-        "data": order_data,
-        "msg": "Order has been post"
-    }
-    return res
-
-
-@app.delete("/order/{id_order}", status_code=status.HTTP_200_OK)
-def delete_order(id_order: int):
-    """
-
-    :param id_order:
-    :return:
-    """
-    for order in orders:
-        if order['id_order'] == id_order:
-            orders.remove(order)
-            res = {
-                "success": True,
-                "data": order
-            }
-            return res
-    raise HTTPException(status_code=404, detail="Tools not found")
-
-
-@app.get("/order/{id_order}", status_code=status.HTTP_200_OK)
-def get_order_by_id(id_order: int):
-    """
-
-    :param id_order:
-    :return:
-    """
-    for order in orders:
-        if order['id_order'] == id_order:
-            res = {
-                "success": True,
-                "data": order
-            }
-            return res
-        raise HTTPException(status_code=404, detail="Tools not found")
 
 
 def write_json():
