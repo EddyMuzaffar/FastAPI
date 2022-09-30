@@ -11,10 +11,6 @@ from starlette import status
 app = FastAPI()
 
 
-class Response(BaseModel):
-    success: bool
-    data: Optional[dict] = []
-    msg: Optional[str] = None
 
 
 class Tools(BaseModel):
@@ -63,7 +59,7 @@ def post_person(person: Person):
                 "success": False,
                 "msg" : 'Person already have this ID'
             }
-            return Response(**res)
+            return res
     people.append(person_data)
     write_json()
     res = {
@@ -72,10 +68,10 @@ def post_person(person: Person):
         "msg": 'Person has been post'
 
     }
-    return Response(**res)
+    return res
 
 
-@app.delete("/people/{id_person}", status_code=status.HTTP_200_OK , response_model=Response)
+@app.delete("/people/{id_person}", status_code=status.HTTP_200_OK )
 def delete_person(id_person: int):
     for person in people:
         if person['id_person'] == id_person:
@@ -85,13 +81,13 @@ def delete_person(id_person: int):
                 "data": person['tools']
 
             }
-            return Response(**res)
+            return res
     res = {
         "success": False,
         "msg": "No ID for this person"
 
     }
-    return Response(**res)
+    return res
 
 
 @app.get('/people/{id_person}/tools', status_code=status.HTTP_200_OK)
@@ -104,18 +100,18 @@ def get_tools_person(id_person: int):
                     "data": person['tools']
 
                 }
-                return Response(**res)
+                return res
             else:
                 res = {
                     "success": False,
                     "msg": 'No tools for this person'
                 }
-                return Response(**res)
+                return res
     res = {
         "success": False,
         "msg": "No people match"
     }
-    return Response(**res)
+    return res
 
 
 @app.get('/people/', status_code=status.HTTP_200_OK)
@@ -139,12 +135,12 @@ def post_tools_person(id_person: int, tool: Tools):
                 "success": True,
                 "data": person['tools']
             }
-            return Response(**res)
+            return res
     res = {
         "success": False,
         "msg": "No people match"
     }
-    return Response(**res)
+    return res
 
 
 @app.get('/people/{id_person}/order', status_code=status.HTTP_200_OK)
@@ -164,7 +160,7 @@ def get_tools_person(id_person: int):
             "success": False,
             "msg": "No people match"
         }
-    return Response(**res)
+    return res
 
 
 
