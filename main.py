@@ -79,6 +79,7 @@ def add_people(people_id: int, name: str, age: int, gender: str, tools: List[str
         "gender": gender,
         "tools": tools
     }
+
     data['people'].append(new_people)
     with open('db.json', 'w') as f:
         json.dump(data, f, indent=4)
