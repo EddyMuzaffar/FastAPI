@@ -1,22 +1,4 @@
 {
-    "users": [
-        {
-            "id": 1,
-            "username": "Test",
-            "money": 1000,
-            "factories": []
-        }
-    ],
-    "posts": [
-        {
-            "id": 1,
-            "title": "",
-            "content": "Markdown ? HTML ? Just Text ?",
-            "author": "",
-            "publishedAt": "Date ?",
-            "category": 1
-        }
-    ],
     "categories": [
         {
             "id": 1,
@@ -78,6 +60,9 @@
             "name": "",
             "age": "",
             "gender": "",
+            "order": [
+                1
+            ],
             "tools": [
                 {
                     "id_tool": 1,
