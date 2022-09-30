@@ -1,151 +1,179 @@
 import json
-from typing import List
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 
-f = open('db.json', 'r')
-data = json.load(f)
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
+from typing import Optional
+
+from starlette import status
 
 app = FastAPI()
 
 
-@app.get("/")
-# read all data from db.json
-def read_root():
-    return data
 
 
-# --------------------------------------- Product --------------------------------------- #
-# add new product to db.json
-@app.post("/products/add")
-def add_product(name: str, description: str, price: float, stock: int):
-    last_product_id = data['products'][-1]['id']
-    new_product = {
-        "id": last_product_id + 1,
-        "name": name,
-        "description": description if description else None,
-        "price": price,
-        "stock": stock
-    }
-    data['products'].append(new_product)
-    with open('db.json', 'w') as f:
-        json.dump(data, f, indent=4)
-    return data['products']
+class Tools(BaseModel):
+    id_tool: int
+    name_tool: str
 
 
-# update product by product_id
-@app.put("/products/update/{product_id}")
-def update_product(product_id: int, name: str, description: str, price: float, stock: int):
-    for product in data['products']:
-        if product['id'] == product_id:
-            product['name'] = name
-            product['description'] = description
-            product['price'] = price
-            product['stock'] = stock
-    with open('db.json', 'w') as f:
-        json.dump(data, f, indent=4)
-    return data['products']
+class Person(BaseModel):
+    id_person: int
+    name: str
+    age: int
+    gender: Optional[str] = None
+    tools: Optional[Tools] = []
 
 
-# delete product by product_id
-@app.delete("/products/delete/{product_id}")
-def delete_product(product_id: int):
-    for product in data['products']:
-        if product['id'] == product_id:
-            data['products'].remove(product)
-    with open('db.json', 'w') as f:
-        json.dump(data, f, indent=4)
-    return data['products']
+class Order(BaseModel):
+    id_order: int
+    id_product: list
+    id_person: int
 
 
-@app.get("/products/{product_id}")
-# read data from db.json by product_id
-def read_product(product_id: int):
-    for product in data['products']:
-        if product['id'] == product_id:
-            return product
+with open('people.json', 'r') as f:
+    people = json.load(f)['people']
+
+with open('people.json', 'r') as f:
+    orders = json.load(f)['orders']
 
 
-# -------------------------------------- People -------------------------------------- #
-# add new people to db.json
-@app.post("/people/add")
-def add_people(people_id: int, name: str, age: int, gender: str, tools: List[str] = Query(None)):
-    last_people_id = data['people'][-1]['id']
-    new_people = {
-        "id": last_people_id + 1,
-        "people_id": people_id,
-        "name": name,
-        "age": age,
-        "gender": gender,
-        "tools": tools
-    }
-
-    data['people'].append(new_people)
-    with open('db.json', 'w') as f:
-        json.dump(data, f, indent=4)
-    return data['people']
+@app.get('/people')
+def get_person():
+    return people
 
 
-@app.get("/people/{people_id}")
-# read data from db.json by people_id
-def read_people(people_id: int):
-    for people in data['people']:
-        if people['id'] == people_id:
-            return people
+@app.get('/people/{id_person}')
+def get_person(p_id: int):
+    person = [p for p in people if p['id_person'] == p_id]
+    return person[0] if len(person) > 0 else {}
 
 
-@app.get("/people")
-# read all people from db.json
-def read_all_people():
-    return data['people']
-
-
-# update people by people_id
-@app.put("/people/update/{people_id}")
-def update_people(people_id: int, name: str, age: int, gender: str, tools: List[str] = Query(None)):
-    for people in data['people']:
-        if people['id'] == people_id:
-            people['name'] = name
-            people['age'] = age
-            people['gender'] = gender
-            people['tools'] = tools
-    with open('db.json', 'w') as f:
-        json.dump(data, f, indent=4)
-    return data['people']
-
-
-# delete people by people_id
-@app.delete("/people/delete/{people_id}")
-def delete_people(people_id: int):
-    for people in data['people']:
-        if people['id'] == people_id:
-            data['people'].remove(people)
-    with open('db.json', 'w') as f:
-        json.dump(data, f, indent=4)
-    return data['people']
-
-
-# --------------------------------------- Order --------------------------------------- #
-# add new order to db.json
-@app.post("/orders/add")
-def add_order(products: List[int], people_id: int):
-    last_order_id = data['orders'][-1]['id']
-    # calculate total price from all products in this order
-    total_price = 0
-    for product_id in products:
-        for product in data['products']:
-            if product['id'] == product_id:
-                total_price += product['price']
-
-    new_order = {
-        "id": last_order_id + 1,
-        "products": products,
-        "people_id": people_id,
-        "total_price": total_price
+@app.post('/people', status_code=status.HTTP_201_CREATED)
+def post_person(person: Person):
+    person_data = jsonable_encoder(person)
+    for person in people:
+        if person['id_person'] == person_data['id_person']:
+            res = {
+                "success": False,
+                "msg" : 'Person already have this ID'
+            }
+            return res
+    people.append(person_data)
+    write_json()
+    res = {
+        "success": True,
+        "data": person_data,
+        "msg": 'Person has been post'
 
     }
+    return res
 
-    data['orders'].append(new_order)
-    with open('db.json', 'w') as f:
-        json.dump(data, f, indent=4)
-    return data['orders']
+
+@app.delete("/people/{id_person}", status_code=status.HTTP_200_OK )
+def delete_person(id_person: int):
+    for person in people:
+        if person['id_person'] == id_person:
+            people.remove(person)
+            res = {
+                "success": True,
+                "data": person['tools']
+
+            }
+            return res
+    res = {
+        "success": False,
+        "msg": "No ID for this person"
+
+    }
+    return res
+
+
+@app.get('/people/{id_person}/tools', status_code=status.HTTP_200_OK)
+def get_tools_person(id_person: int):
+    for person in people:
+        if person['id_person'] == id_person:
+            if 'tools' in person:
+                res = {
+                    "success": True,
+                    "data": person['tools']
+
+                }
+                return res
+            else:
+                res = {
+                    "success": False,
+                    "msg": 'No tools for this person'
+                }
+                return res
+    res = {
+        "success": False,
+        "msg": "No people match"
+    }
+    return res
+
+
+@app.get('/people/', status_code=status.HTTP_200_OK)
+def get_person_by_tools_name(tool_name: str):
+    people_match = []
+    for p in people:
+        for tool in p['tools']:
+            if tool_name == tool['name_tool']:
+                people_match.append(p)
+    return people_match
+
+
+@app.post('/people/{id_person}/tools', status_code=status.HTTP_201_CREATED)
+def post_tools_person(id_person: int, tool: Tools):
+    json_tools_data = jsonable_encoder(tool)
+    for person in people:
+        if person['id_person'] == id_person:
+            person['tools'].append(json_tools_data)
+            write_json()
+            res = {
+                "success": True,
+                "data": person['tools']
+            }
+            return res
+    res = {
+        "success": False,
+        "msg": "No people match"
+    }
+    return res
+
+
+@app.get('/people/{id_person}/order', status_code=status.HTTP_200_OK)
+def get_tools_person(id_person: int):
+    orders_match = []
+    for oder in orders:
+        if id_person == oder['id_person']:
+            orders_match.append(oder)
+    if len(orders_match) > 0:
+        res = {
+            "success": True,
+            "data": orders_match
+            }
+
+    else:
+        res = {
+            "success": False,
+            "msg": "No people match"
+        }
+    return res
+
+
+
+
+
+
+
+def write_json():
+    jsonr = {
+        "people": people,
+        "orders": orders
+    }
+    json_dat = json.dumps(jsonr)
+    json_file = open("people.json", "w")
+    json_file.write(json_dat)
+    json_file.close()
