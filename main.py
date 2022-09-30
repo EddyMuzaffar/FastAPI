@@ -2,19 +2,19 @@ import json
 
 from fastapi import FastAPI
 
-
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from typing import Optional
+
+from starlette import status
+
 app = FastAPI()
 
 
-class Person(BaseModel):
-    id: int
-    name: str
-    age: int
-    gender: Optional[str] = None
-    tools: Optional[dict] = []
+class Response(BaseModel):
+    success: bool
+    data: Optional[dict] = []
+    msg: Optional[str] = None
 
 
 class Tools(BaseModel):
@@ -22,8 +22,25 @@ class Tools(BaseModel):
     name_tool: str
 
 
+class Person(BaseModel):
+    id_person: int
+    name: str
+    age: int
+    gender: Optional[str] = None
+    tools: Optional[Tools] = []
+
+
+class Order(BaseModel):
+    id_order: int
+    id_product: list
+    id_person: int
+
+
 with open('people.json', 'r') as f:
     people = json.load(f)['people']
+
+with open('people.json', 'r') as f:
+    orders = json.load(f)['orders']
 
 
 @app.get('/people')
@@ -31,104 +48,133 @@ def get_person():
     return people
 
 
-@app.get('/people/{p_id}')
+@app.get('/people/{id_person}')
 def get_person(p_id: int):
-    person = [p for p in people if p['id'] == p_id]
+    person = [p for p in people if p['id_person'] == p_id]
     return person[0] if len(person) > 0 else {}
 
 
-@app.post('/people')
+@app.post('/people', status_code=status.HTTP_201_CREATED)
 def post_person(person: Person):
     person_data = jsonable_encoder(person)
     for person in people:
-        if person['id'] == person_data['id']:
+        if person['id_person'] == person_data['id_person']:
             res = {
                 "success": False,
-                "msg": 'Id is already selected'
-
+                "msg" : 'Person already have this ID'
             }
-            return res
+            return Response(**res)
     people.append(person_data)
-    write_json(people)
+    write_json()
     res = {
         "success": True,
-        "data": person_data
+        "data": person_data,
+        "msg": 'Person has been post'
 
     }
-    return res
+    return Response(**res)
 
 
-@app.delete("/people/{id}")
-def delete_person(id: int):
+@app.delete("/people/{id_person}", status_code=status.HTTP_200_OK , response_model=Response)
+def delete_person(id_person: int):
     for person in people:
-        if person['id'] == id:
+        if person['id_person'] == id_person:
             people.remove(person)
-            write_json(people)
             res = {
                 "success": True,
-                "data": person
+                "data": person['tools']
 
             }
-            return res
+            return Response(**res)
     res = {
         "success": False,
         "msg": "No ID for this person"
 
     }
-    return res
+    return Response(**res)
 
 
-@app.get('/people/{id_person}/tools')
+@app.get('/people/{id_person}/tools', status_code=status.HTTP_200_OK)
 def get_tools_person(id_person: int):
     for person in people:
-        if person['id'] == id_person:
+        if person['id_person'] == id_person:
             if 'tools' in person:
                 res = {
                     "success": True,
                     "data": person['tools']
 
                 }
-                return res
+                return Response(**res)
             else:
                 res = {
                     "success": False,
                     "msg": 'No tools for this person'
                 }
-                return res
+                return Response(**res)
     res = {
         "success": False,
         "msg": "No people match"
     }
-    return res
+    return Response(**res)
 
 
-@app.post('/people/{id_person}/tools')
+@app.get('/people/', status_code=status.HTTP_200_OK)
+def get_person_by_tools_name(tool_name: str):
+    people_match = []
+    for p in people:
+        for tool in p['tools']:
+            if tool_name == tool['name_tool']:
+                people_match.append(p)
+    return people_match
+
+
+@app.post('/people/{id_person}/tools', status_code=status.HTTP_201_CREATED)
 def post_tools_person(id_person: int, tool: Tools):
     json_tools_data = jsonable_encoder(tool)
     for person in people:
-        if person['id'] == id_person:
+        if person['id_person'] == id_person:
             person['tools'].append(json_tools_data)
-            write_json(people)
+            write_json()
             res = {
                 "success": True,
                 "data": person['tools']
-}
-            return res
+            }
+            return Response(**res)
     res = {
         "success": False,
         "msg": "No people match"
     }
-    return res
+    return Response(**res)
 
 
-def write_json(data: dict):
+@app.get('/people/{id_person}/order', status_code=status.HTTP_200_OK)
+def get_tools_person(id_person: int):
+    orders_match = []
+    for oder in orders:
+        if id_person == oder['id_person']:
+            orders_match.append(oder)
+    if len(orders_match) > 0:
+        res = {
+            "success": True,
+            "data": orders_match
+            }
+
+    else:
+        res = {
+            "success": False,
+            "msg": "No people match"
+        }
+    return Response(**res)
+
+
+
+
+def write_json():
     jsonr = {
-        "people": data
+        "people": people,
+        "orders": orders
     }
     json_dat = json.dumps(jsonr)
     json_file = open("people.json", "w")
     json_file.write(json_dat)
     json_file.close()
-
-
-
