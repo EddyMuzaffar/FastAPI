@@ -32,5 +32,8 @@ def post_lieu(lieu: Lieux):
 def update_lieu(lieu: Lieux):
     update_lieu_encoded = jsonable_encoder(lieu)
     lieux = update_lieu_encoded
+
+    f.write(json.dumps(lieux))
+
     return update_lieu_encoded
 
